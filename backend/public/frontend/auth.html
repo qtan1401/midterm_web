@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow - Đăng nhập</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    body {
+      background: #f0faf4;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(46,204,113,0.13);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .brand i { font-size: 2rem; color: #2ecc71; }
+    .brand h4 { font-weight: 700; color: #1a3a2a; margin-top: 8px; }
+    .brand p  { color: #6b9e80; font-size: .875rem; margin: 0; }
+    .tab-btns { display: flex; margin-bottom: 24px; border-radius: 8px; overflow: hidden; border: 1px solid #c8ecd6; }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; background: #fff;
+      color: #6b9e80; font-weight: 500; cursor: pointer; transition: all .2s;
+    }
+    .tab-btn.active { background: #2ecc71; color: #fff; }
+    .form-control {
+      border: 1px solid #c8ecd6; border-radius: 8px;
+      padding: 10px 14px; font-size: .9rem;
+    }
+    .form-control:focus {
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 3px rgba(46,204,113,0.15);
+      outline: none;
+    }
+    .btn-submit {
+      width: 100%; padding: 11px; border: none; border-radius: 8px;
+      background: #2ecc71; color: #fff; font-weight: 600;
+      font-size: .95rem; cursor: pointer; transition: background .2s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: #27ae60; }
+    .error-msg {
+      background: #fdf0ed; color: #c0392b;
+      border-radius: 8px; padding: 10px 14px;
+      font-size: .85rem; margin-bottom: 16px; display: none;
+    }
+    label { font-size: .85rem; color: #6b9e80; margin-bottom: 4px; }
+    .form-group { margin-bottom: 16px; }
+    .input-icon { position: relative; }
+    .input-icon i {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); color: #a8d5b8; font-size: .85rem;
+    }
+    .input-icon input { padding-left: 36px; }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="brand">
+      <i class="fas fa-check-double"></i>
+      <h4>TaskFlow</h4>
+    </div>
+
+    <div class="tab-btns">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Đăng nhập</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Đăng ký</button>
+    </div>
+
+    <div id="error-msg" class="error-msg"></div>
+
+    <!-- Login form -->
+    <form id="form-login" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>Tên đăng nhập</label>
+        <div class="input-icon">
+          <i class="fas fa-user"></i>
+          <input type="text" class="form-control" id="login-name" placeholder="Nhập tên của bạn..." required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control" id="login-pass" placeholder="Nhập mật khẩu..." required />
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="btn-login">
+        <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
+      </button>
+    </form>
+
+    <!-- Register form -->
+    <form id="form-register" style="display:none" onsubmit="doRegister(event)">
+      <div class="form-group">
+        <label>Tên đăng nhập</label>
+        <div class="input-icon">
+          <i class="fas fa-user"></i>
+          <input type="text" class="form-control" id="reg-name" placeholder="Chọn tên đăng nhập..." required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control" id="reg-pass" placeholder="Tối thiểu 3 ký tự..." required minlength="3" />
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="btn-register">
+        <i class="fas fa-user-plus mr-2"></i>Tạo tài khoản
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+      document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      hideError();
+    }
+
+    function showError(msg) {
+      var el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('error-msg').style.display = 'none';
+    }
+
+    function setLoading(btnId, loading) {
+      var btn = document.getElementById(btnId);
+      btn.disabled = loading;
+      btn.style.opacity = loading ? '0.7' : '1';
+    }
+
+    async function doLogin(e) {
+      e.preventDefault();
+      hideError();
+      setLoading('btn-login', true);
+      try {
+        var res = await fetch('/api/auth/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name:     document.getElementById('login-name').value.trim(),
+            password: document.getElementById('login-pass').value,
+          })
+        });
+        var data = await res.json();
+        if (!res.ok) { showError(data.message || 'Đăng nhập thất bại'); return; }
+        localStorage.setItem('tf_token', data.token);
+        localStorage.setItem('tf_user', JSON.stringify(data.user));
+        window.location.href = '/';
+      } catch(err) {
+        showError('Lỗi kết nối. Vui lòng thử lại.');
+      } finally {
+        setLoading('btn-login', false);
+      }
+    }
+
+    async function doRegister(e) {
+      e.preventDefault();
+      hideError();
+      setLoading('btn-register', true);
+      try {
+        var res = await fetch('/api/auth/register', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name:     document.getElementById('reg-name').value.trim(),
+            password: document.getElementById('reg-pass').value,
+          })
+        });
+        var data = await res.json();
+        if (!res.ok) {
+          var msg = data.errors ? Object.values(data.errors)[0][0] : (data.message || 'Đăng ký thất bại');
+          showError(msg);
+          return;
+        }
+        localStorage.setItem('tf_token', data.token);
+        localStorage.setItem('tf_user', JSON.stringify(data.user));
+        window.location.href = '/';
+      } catch(err) {
+        showError('Lỗi kết nối. Vui lòng thử lại.');
+      } finally {
+        setLoading('btn-register', false);
+      }
+    }
+
+    // Kiem tra neu da login thi redirect luon
+    if (localStorage.getItem('tf_token')) {
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
